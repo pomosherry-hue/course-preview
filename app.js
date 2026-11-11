@@ -1,15 +1,26 @@
 /* 色彩观察学院 · 书网站本地预览（纯前端，无AI，无上传） */
 (function(){
 'use strict';
-var B=window.BOOK, SW=B.sw, PL=B.plain;
+var B=window.BOOK, SW=B.sw, PL=B.plain, CH=1, D=null;
+var CN=['','一','二','三','四','五','六','七','八','九','十','十一','十二'];
 var app=document.getElementById('app');
 var KEY='coa-book-v1';
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return{}}}
 var st=load(); st.scores=st.scores||{}; st.subs=st.subs||{};
 function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-function unlocked(n){return n===1||st.teacher||(st.scores[n-1]||0)>=9}
-function sec(n){return B.sections[n-1]}
+function meta(c){return B.chapters[c-1]}
+function K(c,n){return c===1?n:c+'-'+n}
+function passOf(rows){return Math.ceil((rows||4)*3*0.75)}
+function maxOf(rows){return (rows||4)*3}
+function passed(c,n){var m=meta(c),s=m&&m.secs[n-1];if(!s)return false;return (st.scores[K(c,n)]||0)>=passOf(s.rows)}
+function unlockedC(c,n){if(st.teacher)return true;if(n===1)return c===1||passed(c-1,10);return passed(c,n-1)}
+function unlocked(n){return unlockedC(CH,n)}
+function sec(n){return D.sections[n-1]}
+function chName(c){var m=meta(c);return m.title.replace(/ [A-Za-z].*$/,'')}
+function needCh(c,cb){window.BOOKCH=window.BOOKCH||{};if(window.BOOKCH[c]){cb();return}
+ app.innerHTML='<p class="hint">正在载入'+(CN[c]?'第'+CN[c]+'章':'')+'……</p>';
+ var sc=document.createElement('script');sc.src='data/ch'+c+'.js?v='+meta(c).v;sc.onload=cb;sc.onerror=function(){app.innerHTML='<div class="card"><p>载入失败，请检查网络后刷新。</p></div>'};document.head.appendChild(sc)}
 
 var VOLS=[
  {t:'第一卷 · 训练眼睛',ch:[[1,'色块','Color Spots'],[2,'边缘形','Edge Shapes'],[3,'颜色笔记','Color Notes'],[4,'比较观察','Comparative Seeing']]},
@@ -39,49 +50,51 @@ document.addEventListener('click',function(e){var c=e.target.closest('.mchip');i
 
 /* ---------- 首页 ---------- */
 function home(){
- var h='<section class="card hero"><p class="t1">Color Observation Academy｜色彩观察学院</p><h1>职业色彩训练体系</h1><p>每一节都分三步：<b>阅读</b> → <b>练习</b> → <b>作业</b>。每章十节，基础、进阶、挑战三级作业，达到 9/12 分再进入下一节。</p><p><a class="btn" href="#/ch1">开始第一章 →</a></p></section>';
- VOLS.forEach(function(v){
-  h+='<section class="vol"><h2>'+v.t+'</h2><div class="chlist">';
-  v.ch.forEach(function(c){
-   var on=c[0]===1;
-   h+= on? '<a class="ch" href="#/ch1"><span class="num">'+c[0]+'</span><span><span class="nm">第'+c[0]+'章 '+c[1]+'</span><br><span class="st">'+doneCount()+' / 10 节已达标 · 开始学习 →</span></span></a>'
-         : '<div class="ch soon"><span class="num">'+c[0]+'</span><span><span class="nm">第'+c[0]+'章 '+c[1]+'</span><br><span class="st">即将开放</span></span></div>';
+ var h='<section class="card hero"><p class="t1">Color Observation Academy｜色彩观察学院</p><h1>职业色彩训练体系</h1><p>每一节都分三步：<b>阅读</b> → <b>练习</b> → <b>作业</b>。全书三卷十二章，每章十节，基础、进阶、挑战三级作业，达到达标线（多数是 9/12 分）再进入下一节。</p><p><a class="btn" href="#/ch1">从第一章开始 →</a></p></section>';
+ var vt=['','第一卷 · 训练眼睛','第二卷 · 训练颜色','第三卷 · 组织画面'];
+ for(var v=1;v<=3;v++){
+  h+='<section class="vol"><h2>'+vt[v]+'</h2><div class="chlist">';
+  B.chapters.forEach(function(m){ if(m.vol!==v)return;
+   var parts=m.title.split(' '),nm=parts.slice(0,2).join(' '),en=parts.slice(2).join(' ');
+   var open=unlockedC(m.no,1);
+   h+='<a class="ch" href="#/ch'+m.no+'"><span class="num">'+m.no+'</span><span><span class="nm">'+esc(nm)+'</span> <span class="hint">'+esc(en)+'</span><br><span class="st">'+doneCount(m.no)+' / 10 节已达标 · '+(open?'开始学习 →':'🔒 完成上一章后解锁（可先浏览目录）')+'</span></span></a>';
   });
   h+='</div></section>';
- });
- h+='<section class="card"><h2 style="margin-top:0">孟塞尔记号怎么学</h2><ol class="steps"><li><b>第1–2章：会读就行。</b>记号藏在“老师的注”里，配色样和白话。作业用白话描述即可得满分。</li><li><b>第3章：自己写读数。</b>先明度，再色相，最后彩度，用灰阶卡或实体色卡。从这里起读数计入评分。</li><li><b>第二卷起：求精确。</b>更细的色相档位和彩度上限，并链接到《AI时代的孟塞尔色彩学》讲“为什么”。</li></ol></section>';
+ }
+ h+='<section class="card"><h2 style="margin-top:0">孟塞尔记号怎么学</h2><ol class="steps"><li><b>第1–2章：会读就行。</b>记号藏在“老师的注”里，配色样和白话。作业用白话描述即可得满分。</li><li><b>第3章起：自己写读数。</b>先明度，再色相，最后彩度，用灰阶卡或实体色卡。从这里起读数计入评分。</li><li><b>第二卷起：求精确。</b>更细的色相档位和彩度上限。</li></ol></section>';
  app.innerHTML=h;
 }
-function doneCount(){var n=0;for(var i=1;i<=10;i++)if((st.scores[i]||0)>=9)n++;return n}
+function doneCount(c){var n=0;for(var i=1;i<=10;i++)if(passed(c,i))n++;return n}
 
 /* ---------- 章节页 ---------- */
 function chapter(){
- var h='<p class="crumb"><a href="#/">首页</a> › 第一卷</p><h1>第一章 色块 Color Spots</h1>'+
- '<blockquote><p><b>本章能力目标</b>　从“认出物体”转向“比较色块”：学生能够识别、记录、简化并组织观察到的大色块关系。</p></blockquote>'+
- '<div class="chlist seclist">';
- B.sections.forEach(function(s){
-  var u=unlocked(s.no),sc=st.scores[s.no];
+ var vt=['','第一卷','第二卷','第三卷'];
+ var h='<p class="crumb"><a href="#/">首页</a> › '+vt[D.vol]+'</p><h1>'+esc(D.title)+'</h1>'+(D.intro||'')+'<div class="chlist seclist">';
+ D.sections.forEach(function(s){
+  var u=unlocked(s.no),sc=st.scores[K(CH,s.no)],ps=passOf(s.rows.length),mx=maxOf(s.rows.length);
   var t=s.title.replace(/^第\d+节 /,'');
-  h+= u? '<a class="ch" href="#/ch1/s'+s.no+'/read"><span class="num">'+s.no+'</span><span><span class="nm">'+esc(t)+'</span>'+(sc>=9?'<span class="badge">已达标 '+sc+'/12</span>':sc?'<span class="badge lock">'+sc+'/12 未达标</span>':'')+'<br><span class="st">阅读 · 练习 · 作业</span></span></a>'
-       : '<div class="ch locked" onclick="alert(\'完成第'+(s.no-1)+'节作业并达到 9/12 分后解锁\')"><span class="num">🔒</span><span><span class="nm">第'+s.no+'节 '+esc(t)+'</span><br><span class="st">完成第'+(s.no-1)+'节作业（≥9/12）后解锁</span></span></div>';
+  h+= u? '<a class="ch" href="#/ch'+CH+'/s'+s.no+'/read"><span class="num">'+s.no+'</span><span><span class="nm">'+esc(t)+'</span>'+(sc>=ps?'<span class="badge">已达标 '+sc+'/'+mx+'</span>':sc?'<span class="badge lock">'+sc+'/'+mx+' 未达标</span>':'')+'<br><span class="st">阅读 · 练习 · 作业'+(s.cards?' · 场景图 '+s.cards+' 张':'')+'</span></span></a>'
+       : '<div class="ch locked" onclick="alert(\''+(s.no===1?'先完成上一章第10节作业并达标':'完成第'+(s.no-1)+'节作业并达标后解锁')+'\')"><span class="num">🔒</span><span><span class="nm">第'+s.no+'节 '+esc(t)+'</span><br><span class="st">'+(s.no===1?'完成上一章第10节作业（达标）后解锁':'完成第'+(s.no-1)+'节作业（达标）后解锁')+'</span></span></div>';
  });
- app.innerHTML=h+'</div>';
+ h+='</div>';
+ if(CH>1)h+='<p class="hint">提示：页脚的“老师预览：全部解锁”可以跳过解锁顺序，方便浏览。</p>';
+ app.innerHTML=h;
 }
 
 /* ---------- 小节页 ---------- */
 function section(n,tab){
- if(!unlocked(n)){app.innerHTML='<p class="crumb"><a href="#/ch1">第一章</a></p><div class="card"><h2>🔒 第'+n+'节还没解锁</h2><p>完成第'+(n-1)+'节作业并达到 9/12 分后，这一节会自动打开。</p><a class="btn" href="#/ch1/s'+(n-1)+'/hw">去第'+(n-1)+'节作业</a></div>';return}
+ if(!unlocked(n)){app.innerHTML='<p class="crumb"><a href="#/ch'+CH+'">'+esc(chName(CH))+'</a></p><div class="card"><h2>🔒 第'+n+'节还没解锁</h2><p>'+(n===1?'先完成上一章第10节作业并达标，这一章会自动打开。':'完成第'+(n-1)+'节作业并达标后，这一节会自动打开。')+'</p>'+(n===1?'<a class="btn" href="#/ch'+(CH-1)+'/s10/hw">去上一章第10节作业</a>':'<a class="btn" href="#/ch'+CH+'/s'+(n-1)+'/hw">去第'+(n-1)+'节作业</a>')+'<p class="hint">测试时可点页脚“老师预览：全部解锁”。</p></div>';return}
  var s=sec(n);
- var h='<p class="crumb"><a href="#/">首页</a> › <a href="#/ch1">第一章 色块</a></p><h1>'+esc(s.title)+'</h1>'+
- '<nav class="tabs"><a href="#/ch1/s'+n+'/read" class="'+(tab==='read'?'on':'')+'">① 阅读</a><a href="#/ch1/s'+n+'/practice" class="'+(tab==='practice'?'on':'')+'">② 练习</a><a href="#/ch1/s'+n+'/hw" class="'+(tab==='hw'?'on':'')+'">③ 作业</a></nav><div id="pane"></div>';
+ var h='<p class="crumb"><a href="#/">首页</a> › <a href="#/ch'+CH+'">'+esc(chName(CH))+'</a></p><h1>'+esc(s.title)+'</h1>'+
+ '<nav class="tabs"><a href="#/ch'+CH+'/s'+n+'/read" class="'+(tab==='read'?'on':'')+'">① 阅读</a><a href="#/ch'+CH+'/s'+n+'/practice" class="'+(tab==='practice'?'on':'')+'">② 练习</a><a href="#/ch'+CH+'/s'+n+'/hw" class="'+(tab==='hw'?'on':'')+'">③ 作业</a></nav><div id="pane"></div>';
  app.innerHTML=h;
  var p=document.getElementById('pane');
  if(tab==='read'){
   p.innerHTML=s.head+s.read+(s.refs?'<details><summary>参考文献（本节引用）</summary>'+s.refs+'</details>':'')+
-   '<div class="nextnav"><span></span><a class="btn" href="#/ch1/s'+n+'/practice">读完了，去练习 →</a></div>';
+   '<div class="nextnav"><span></span><a class="btn" href="#/ch'+CH+'/s'+n+'/practice">读完了，去练习 →</a></div>';
   p.querySelectorAll('img.scard-img').forEach(function(im){im.onclick=function(){
    showModal('<img class="scard-big" src="'+im.getAttribute('src')+'" alt="'+esc(im.alt)+'"><p class="scard-cap">'+esc(im.alt)+' · <a href="'+im.getAttribute('src')+'" target="_blank" rel="noopener">打开原图（可两指放大）</a></p>')}});
-  if(n===1){var c=p.querySelector('.mchip');if(c){var at=c.closest('.tw')||c.closest('p');var d=document.createElement('div');d.innerHTML=explainer();at.parentNode.insertBefore(d.firstChild,at)}}
+  if(n===1&&CH===1){var c=p.querySelector('.mchip');if(c){var at=c.closest('.tw')||c.closest('p');var d=document.createElement('div');d.innerHTML=explainer();at.parentNode.insertBefore(d.firstChild,at)}}
  } else if(tab==='practice'){ practice(n,p) } else { homework(n,p) }
  window.scrollTo(0,0);
 }
@@ -199,8 +212,8 @@ function widget(n,p){
  }
  return {h:h,after:after,src:src};
 }
-function practice(n,p){var w=widget(n,p);
- p.innerHTML=w.src+w.h+'<div class="nextnav"><a class="btn sec" href="#/ch1/s'+n+'/read">← 回到阅读</a><a class="btn" href="#/ch1/s'+n+'/hw">去做作业 →</a></div>';
+function practice(n,p){var w=CH===1?widget(n,p):(window.widget2?window.widget2(CH,n,p,{sec:sec,sw:sw,PL:PL,quiz:quiz,blk:blk,st:st,save:save,esc:esc}):{h:'',src:''});
+ p.innerHTML=w.src+w.h+'<div class="nextnav"><a class="btn sec" href="#/ch'+CH+'/s'+n+'/read">← 回到阅读</a><a class="btn" href="#/ch'+CH+'/s'+n+'/hw">去做作业 →</a></div>';
  if(w.after)w.after();
 }
 
@@ -226,13 +239,15 @@ function bindForm(key,onDone){
   st.subs[key]=sub;save();onDone(sub,photoURL);};
 }
 function homework(n,p){
- var s=sec(n),sub=st.subs[n]||{};
- var policy='<div class="note"><b>第一章约定：</b>用白话描述颜色（如“偏黄的很浅色”“冷一点、暗一点”）即可得满分；孟塞尔读数可写可不写，写了算加分。“坐标判断准确度”一项，第1–2章按你的白话比较是否准确来判断。</div>';
- p.innerHTML='<div class="card"><h2 style="margin-top:0">本节作业</h2>'+s.hw+'</div>'+
-  '<div class="card"><h2 style="margin-top:0">交作业前，先看评分标准</h2><p class="hint">老师会按下面四项逐项给分，每项 3 / 2 / 1 分，满分 12 分。<b>达到 9 分</b>，下一节自动打开；没达到可以修改后重新提交。</p>'+s.rubric+policy+'</div>'+
-  formHTML(sub,'可选，第1–2章不要求');
- var opts={key:n,rows:s.rows,gate:true,next:n<10?{href:'#/ch1/s'+(n+1)+'/read',name:'第'+(n+1)+'节'}:null};
- bindForm(n,function(sb,url){demoMark(opts,sb,url)});
+ var s=sec(n),key=K(CH,n),sub=st.subs[key]||{},R=s.rows.length,mx=maxOf(R),ps=passOf(R);
+ var policy=CH<=2?'<div class="note"><b>第1–2章约定：</b>用白话描述颜色（如“偏黄的很浅色”“冷一点、暗一点”）即可得满分；孟塞尔读数可写可不写，写了算加分。“坐标判断准确度”一类项目，按你的白话比较是否准确来判断。</div>'
+   :'<div class="note"><b>第3章起：</b>请写下孟塞尔读数（先明度，再色相，最后彩度），并注明光源、背景和时间；读数计入评分。网站和老师不会从照片里读取孟塞尔数值。</div>';
+ var rub=R?'<div class="card"><h2 style="margin-top:0">交作业前，先看评分标准</h2><p class="hint">老师会按下面 '+R+' 项逐项给分，每项 3 / 2 / 1 分，满分 '+mx+' 分。<b>达到 '+ps+' 分</b>，下一节自动打开；没达到可以修改后重新提交。</p>'+s.rubric+policy+'</div>'
+   :'<div class="card"><p>本节没有单独的评分表，按正文的达标清单自查即可。</p>'+policy+'</div>';
+ p.innerHTML='<div class="card"><h2 style="margin-top:0">本节作业</h2>'+s.hw+'</div>'+rub+formHTML(sub,CH<=2?'可选，第1–2章不要求':'第3章起需要填写');
+ var nx=n<10?{href:'#/ch'+CH+'/s'+(n+1)+'/read',name:'第'+(n+1)+'节'}:(CH<12?{href:'#/ch'+(CH+1),name:'第'+CN[CH+1]+'章'}:null);
+ var opts={key:key,rows:R?s.rows:[['完成情况','按清单全部完成','大部分完成','刚开始']],gate:true,next:nx};
+ bindForm(key,function(sb,url){demoMark(opts,sb,url)});
  if(sub.at)demoMark(opts,sub,null);
 }
 function demoMark(o,sub,photoURL){
@@ -259,11 +274,11 @@ function demoMark(o,sub,photoURL){
   document.getElementById('next').onclick=function(){i++;render()};
   var sels=box.querySelectorAll('select');
   function tot(){var t=0;sels.forEach(function(x){t+=+x.value});
-   document.getElementById('tot').textContent=o.gate?('合计 '+t+' / 12'+(t>=9?'（达标）':'（未达标，需 ≥9）')):('得分 '+t+' / '+max+(t>=max*0.75?' —— 很棒！':t>=max*0.5?' —— 已经抓到要点了，继续加油！':' —— 刚起步，慢慢来，可以改了再交。'));return t}
+   var ps=Math.ceil(max*0.75);document.getElementById('tot').textContent=o.gate?('合计 '+t+' / '+max+(t>=ps?'（达标）':'（未达标，需 ≥'+ps+'）')):('得分 '+t+' / '+max+(t>=max*0.75?' —— 很棒！':t>=max*0.5?' —— 已经抓到要点了，继续加油！':' —— 刚起步，慢慢来，可以改了再交。'));return t}
   sels.forEach(function(x){x.onchange=tot});tot();
   document.getElementById('saveScore').onclick=function(){var t=tot();st.sim=st.sim||{};st.sim[n]=[].map.call(sels,function(x){return +x.value});st.scores[n]=t;save();
    if(!o.gate){document.getElementById('unlockmsg').innerHTML='<p class="okmsg">已保存。分数只是给你的鼓励，不影响下一课。</p>';return}
-   document.getElementById('unlockmsg').innerHTML=t>=9?(o.next?'<p class="okmsg">达标！'+o.next.name+'已解锁。<a href="'+o.next.href+'">去'+o.next.name+' →</a></p>':'<p class="okmsg">第一章全部达标！</p>'):'<p class="note">还差 '+(9-t)+' 分。可以按老师的建议修改后重新提交。</p>'};
+   var ps=Math.ceil(max*0.75);document.getElementById('unlockmsg').innerHTML=t>=ps?(o.next?'<p class="okmsg">达标！'+o.next.name+'已解锁。<a href="'+o.next.href+'">去'+o.next.name+' →</a></p>':'<p class="okmsg">全书最后一节完成，恭喜！</p>'):'<p class="note">还差 '+(ps-t)+' 分。可以按老师的建议修改后重新提交。</p>'};
   document.getElementById('revise').onclick=function(){document.getElementById('hwform').scrollIntoView({behavior:'smooth'})};
  }
  render();
@@ -273,8 +288,9 @@ function demoMark(o,sub,photoURL){
 /* ---------- 路由 ---------- */
 function route(){
  var h=location.hash.replace(/^#\/?/,'').split('/');
- if(h[0]==='ch1'&&h[1]){var n=+h[1].slice(1);section(n,h[2]||'read')}
- else if(h[0]==='ch1')chapter();
+ var mm=/^ch(\d+)$/.exec(h[0]||'');
+ if(mm&&meta(+mm[1])){var c=+mm[1];needCh(c,function(){CH=c;D=window.BOOKCH[c];
+   if(h[1]){var n=+h[1].slice(1);if(n>=1&&n<=D.sections.length)section(n,h[2]||'read');else chapter()}else chapter()});return}
  else if(h[0]==='e'){location.replace('#/ch1');return}
  else home();
 }

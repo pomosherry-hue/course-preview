@@ -154,3 +154,6 @@ summary{font-weight:700;cursor:pointer}
 .modal:has(.scard-big){padding:6px}
 .modalbox:has(.scard-big){padding:8px 6px 10px;max-height:94vh}
 .scard-cap a{font-weight:700}
+
+/* long arrow chains like R→YR→Y… must wrap on phones */
+main p, main li, main td, main h4, main h5 { overflow-wrap: anywhere; }

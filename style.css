@@ -139,32 +139,16 @@ summary{font-weight:700;cursor:pointer}
 .nextnav{display:flex;justify-content:space-between;gap:8px;margin-top:24px}
 .swfig .mchip .sw{display:none}
 .preview img{max-height:280px;object-fit:contain;background:#eee}
-.hbtns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-.hbtns .mbtn{font-size:.72rem;padding:5px 9px}
-.pathcard{display:block;width:100%;text-align:left;background:#fff;border:2px solid var(--line);border-radius:14px;padding:14px;margin:10px 0;font-size:.95rem;line-height:1.6;color:var(--ink)}
-.pathcard .pt{display:block;font-weight:700;font-size:1.08rem;margin-bottom:4px}
-.pathcard.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 2px var(--accent) inset}
-.lintro{font-size:1.05rem;background:#fff;border-radius:12px;padding:12px 14px;border:1px solid var(--line)}
-.lpart{color:var(--accent);margin-top:1.6em}
-.lblock h3{border-top:0;padding-top:0;margin-top:1.2em}
-.bookq{border-left:5px solid #b9b7b0;background:#fff;border-radius:0 12px 12px 0;padding:6px 14px 8px;margin:8px 0}
-.qtag{display:inline-block;font-size:.7rem;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:0 6px;margin:6px 0 2px}
-.gloss{color:#2f5a7a;font-size:.9em;background:#eef4f8;border-radius:6px;padding:0 4px}
-.tipcard{background:#fff8e6;border:2px solid #e8c56a;border-radius:14px;padding:12px 14px;margin:16px 0}
-.tiptitle{font-weight:700;font-size:1.05rem;margin:0 0 4px}
-.tipcard .bookq{background:#fffdf6}
-details.extra{border:2px dashed #a9a7a0}
-details.extra>summary{font-size:1.02rem}
-.mins{color:var(--soft);font-size:.9rem;margin:0}
-.hwlist li{margin:6px 0}
-.hbtns{flex-wrap:nowrap}
 @media (max-width:420px){.brand span{font-size:.55rem}.brand{font-size:.95rem}}
 
-/* 课程视频（适合长辈：大按钮、大字说明） */
-.lvid{margin:0 0 18px;background:#1b1b1a;border-radius:16px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.12)}
-.lvid video{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#000}
-.lvid .vbtns{display:flex;gap:8px;padding:10px;background:#2a2926}
-.lvid .vb{flex:1;min-height:52px;font-size:19px;font-weight:700;border:0;border-radius:12px;background:#f6e6dc;color:#1b1b1a;cursor:pointer}
-.lvid .vb:active{transform:scale(.98)}
-.lvid figcaption{background:var(--paper);color:var(--ink);padding:12px 14px 14px;font-size:18px;line-height:1.6}
-.lvid figcaption small{display:block;margin-top:6px;font-size:15px;color:var(--muted)}
+/* 第1节场景图卡 */
+.scards{margin:14px 0 22px}
+.scards-t{margin:0 0 10px}
+.scards-g{display:grid;grid-template-columns:1fr;gap:16px}
+@media (min-width:700px){.scards-g{grid-template-columns:1fr 1fr}}
+.scards figure{margin:0;background:var(--paper);border-radius:14px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.10)}
+.scards img{display:block;width:100%;height:auto;cursor:zoom-in}
+.scards figcaption{padding:10px 12px;font-size:17px;font-weight:600}
+.scard-big{display:block;width:100%;height:auto;border-radius:10px}
+.scard-cap{margin:8px 0 0;font-size:17px;text-align:center}
+.modalbody .scard-big{margin-top:30px}

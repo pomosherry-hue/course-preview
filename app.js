@@ -38,32 +38,20 @@ document.getElementById('resetAll').onclick=function(){if(confirm('清除这台�
 document.addEventListener('click',function(e){var c=e.target.closest('.mchip');if(c){c.classList.toggle('open');c.setAttribute('aria-expanded',c.classList.contains('open'))}});
 
 /* ---------- 首页 ---------- */
-var EVCH={1:1,2:1,3:1,4:1,6:1,8:1};
 function home(){
- var ev=st.path!=='pro';
- var h='<section class="card hero"><p class="t1">Color Observation Academy｜色彩观察学院</p><h1>职业色彩训练体系</h1><p>每一课都分三步：<b>阅读</b> → <b>练习</b> → <b>作业</b>。</p></section>'+
- '<section class="card"><h2 style="margin-top:0">选一条适合你的路线</h2><p>两条路线学的是同一本书。没有压力，<b>随时可以换</b>，进度都会保留。</p>'+
- '<button type="button" class="pathcard'+(ev?' on':'')+'" id="pEv"><span class="pt">🌿 日常观察路线 <span class="badge">推荐</span></span><span>每章约5节短课，每节10–15分钟。用白话描述颜色就好，不用写数字。交了作业，下一课就打开。</span></button>'+
- '<button type="button" class="pathcard'+(!ev?' on':'')+'" id="pPro"><span class="pt">🎨 专业训练路线</span><span>完整的每章十节，基础、进阶、挑战三级作业，达到 9/12 分再进入下一节。适合想系统训练、准备专业学习的同学。</span></button>'+
- '<p class="hint">现在选的是：<b>'+pathName()+'路线</b></p></section>';
+ var h='<section class="card hero"><p class="t1">Color Observation Academy｜色彩观察学院</p><h1>职业色彩训练体系</h1><p>每一节都分三步：<b>阅读</b> → <b>练习</b> → <b>作业</b>。每章十节，基础、进阶、挑战三级作业，达到 9/12 分再进入下一节。</p><p><a class="btn" href="#/ch1">开始第一章 →</a></p></section>';
  VOLS.forEach(function(v){
   h+='<section class="vol"><h2>'+v.t+'</h2><div class="chlist">';
   v.ch.forEach(function(c){
-   var on=c[0]===1, inEv=!!EVCH[c[0]];
-   var tag=inEv?'<span class="badge">日常路线 ✓</span>':'<span class="badge lock">仅专业路线</span>';
-   var href=ev?'#/e':'#/ch1';
-   var prog=ev?evDone()+' / 5 课已交作业':doneCount()+' / 10 节已达标';
-   h+= on? '<a class="ch" href="'+href+'"><span class="num">'+c[0]+'</span><span><span class="nm">第'+c[0]+'章 '+c[1]+'</span>'+tag+'<br><span class="st">'+prog+' · 开始学习 →</span></span></a>'
-         : '<div class="ch soon"><span class="num">'+c[0]+'</span><span><span class="nm">第'+c[0]+'章 '+c[1]+'</span>'+tag+'<br><span class="st">即将开放</span></span></div>';
+   var on=c[0]===1;
+   h+= on? '<a class="ch" href="#/ch1"><span class="num">'+c[0]+'</span><span><span class="nm">第'+c[0]+'章 '+c[1]+'</span><br><span class="st">'+doneCount()+' / 10 节已达标 · 开始学习 →</span></span></a>'
+         : '<div class="ch soon"><span class="num">'+c[0]+'</span><span><span class="nm">第'+c[0]+'章 '+c[1]+'</span><br><span class="st">即将开放</span></span></div>';
   });
   h+='</div></section>';
  });
- h+='<section class="card"><h2 style="margin-top:0">孟塞尔记号怎么学</h2><p class="hint">日常观察路线：一直用白话描述就好，孟塞尔记号只是“老师的注”，想看再点开。</p><ol class="steps"><li><b>第1–2章：会读就行。</b>记号藏在“老师的注”里，配色样和白话。作业用白话描述即可得满分。</li><li><b>第3章（专业路线）：自己写读数。</b>先明度，再色相，最后彩度，用灰阶卡或实体色卡。从这里起读数计入评分。</li><li><b>第二卷起（专业路线）：求精确。</b>更细的色相档位和彩度上限，并链接到《AI时代的孟塞尔色彩学》讲“为什么”。</li></ol></section>';
+ h+='<section class="card"><h2 style="margin-top:0">孟塞尔记号怎么学</h2><ol class="steps"><li><b>第1–2章：会读就行。</b>记号藏在“老师的注”里，配色样和白话。作业用白话描述即可得满分。</li><li><b>第3章：自己写读数。</b>先明度，再色相，最后彩度，用灰阶卡或实体色卡。从这里起读数计入评分。</li><li><b>第二卷起：求精确。</b>更细的色相档位和彩度上限，并链接到《AI时代的孟塞尔色彩学》讲“为什么”。</li></ol></section>';
  app.innerHTML=h;
- document.getElementById('pEv').onclick=function(){setPath('ev',false)};
- document.getElementById('pPro').onclick=function(){setPath('pro',false)};
 }
-function evDone(){var n=0;for(var i=1;i<=5;i++)if(st.subs['e'+i]&&st.subs['e'+i].at)n++;return n}
 function doneCount(){var n=0;for(var i=1;i<=10;i++)if((st.scores[i]||0)>=9)n++;return n}
 
 /* ---------- 章节页 ---------- */
@@ -89,9 +77,9 @@ function section(n,tab){
  app.innerHTML=h;
  var p=document.getElementById('pane');
  if(tab==='read'){
-  p.innerHTML=(n===1?videoBlock('p1'):'')+s.head+s.read+(s.refs?'<details><summary>参考文献（本节引用）</summary>'+s.refs+'</details>':'')+
+  p.innerHTML=s.head+s.read+(s.refs?'<details><summary>参考文献（本节引用）</summary>'+s.refs+'</details>':'')+
    '<div class="nextnav"><span></span><a class="btn" href="#/ch1/s'+n+'/practice">读完了，去练习 →</a></div>';
-  if(n===1)bindVideo('p1');
+  if(n===1)sceneCards(p);
   if(n===1){var c=p.querySelector('.mchip');if(c){var at=c.closest('.tw')||c.closest('p');var d=document.createElement('div');d.innerHTML=explainer();at.parentNode.insertBefore(d.firstChild,at)}}
  } else if(tab==='practice'){ practice(n,p) } else { homework(n,p) }
  window.scrollTo(0,0);
@@ -262,7 +250,7 @@ function demoMark(o,sub,photoURL){
   (photoURL?'<div class="preview"><img src="'+photoURL+'" alt="已提交的照片"></div>':'')+
   itemHTML(i)+
   '<p><button class="btn sec" id="prev"'+(i===0?' disabled':'')+'>← 上一项</button><button class="btn" id="next"'+(i===rows.length-1?' disabled':'')+'>下一项 →</button></p>'+
-  '<details'+(st.scores[n]?' open':'')+'><summary>老师演示：模拟打分'+(o.gate?'（测试“达标解锁”用）':'（日常路线：分数只作鼓励）')+'</summary><div class="scorebox">'+
+  '<details'+(st.scores[n]?' open':'')+'><summary>老师演示：模拟打分'+'（测试“达标解锁”用）'+'</summary><div class="scorebox">'+
    rows.map(function(r,k){var cur=(st.sim&&st.sim[n]&&st.sim[n][k])||2;return '<p>'+esc(r[0])+'：<select data-k="'+k+'">'+[3,2,1].map(function(x){return '<option'+(x==cur?' selected':'')+'>'+x+'</option>'}).join('')+'</select></p>'}).join('')+
    '<p class="total" id="tot"></p><button class="btn" id="saveScore">保存分数</button><div id="unlockmsg"></div></div></details>'+
   '<p><button class="btn sec" id="revise">修改后重新提交</button></p></div>';
@@ -281,82 +269,29 @@ function demoMark(o,sub,photoURL){
  if(photoURL)box.scrollIntoView({behavior:'smooth'});
 }
 
-/* ---------- 日常观察路线 ---------- */
-var EV=B.everyday;
-function evUnlocked(id){return id===1||st.teacher||!!(st.subs['e'+(id-1)]&&st.subs['e'+(id-1)].at)}
-function evChapter(){
- var h='<p class="crumb"><a href="#/">首页</a> › 第一卷 · 日常观察路线</p><h1>第一章 色块</h1><p class="lintro">五节短课，每节大约 10–15 分钟。交了作业，下一课就打开。不赶时间。</p><div class="chlist seclist">';
- EV.forEach(function(L){var u=evUnlocked(L.id),done=st.subs['e'+L.id]&&st.subs['e'+L.id].at;
-  h+= u?'<a class="ch" href="#/e/L'+L.id+'/read"><span class="num">'+L.id+'</span><span><span class="nm">'+esc(L.title)+'</span>'+(done?'<span class="badge">已交作业 ✓</span>':'')+'<br><span class="st">约 '+L.min+' 分钟 · 书中'+esc(L.src)+'</span></span></a>'
-   :'<div class="ch locked" onclick="alert(\'交了第'+(L.id-1)+'课的作业，这一课就会打开\')"><span class="num">🔒</span><span><span class="nm">第'+L.id+'课 '+esc(L.title)+'</span><br><span class="st">约 '+L.min+' 分钟 · 交了上一课作业后打开</span></span></div>';});
- app.innerHTML=h+'</div><p class="hint">想学完整的十节内容？可以随时在页面上方切换到“专业训练路线”。</p>';
+/* ---------- 第1节场景图卡 ---------- */
+var SCARDS=[
+ ['img/l1-card1-cup.jpg','案例1 白瓷杯与晨光'],
+ ['img/l1-card2-wall-sunny.jpg','案例2 办公室白墙 · 晴天'],
+ ['img/l1-card3-wall-cloudy.jpg','案例2 办公室白墙 · 阴天'],
+ ['img/l1-card4-road-noon.jpg','案例3 柏油路面 · 正午'],
+ ['img/l1-card5-road-dusk.jpg','案例3 柏油路面 · 黄昏']];
+function sceneCards(p){
+ var at=[].slice.call(p.querySelectorAll('h4')).filter(function(h){return h.textContent.indexOf('案例与色彩分析')>=0})[0];
+ var d=document.createElement('section');d.className='scards';
+ d.innerHTML='<h4 class="scards-t">场景图卡（点图片可放大）</h4><div class="scards-g">'+SCARDS.map(function(c,i){
+  return '<figure><img src="'+c[0]+'" alt="'+esc(c[1])+'" loading="lazy" width="1080" height="1350" data-i="'+i+'"><figcaption>'+esc(c[1])+'</figcaption></figure>'}).join('')+
+  '</div><p class="hint">照片为AI生成，颜色以卡片上的色块为准（按书中孟塞尔数值绘制）。</p>';
+ if(at)at.parentNode.insertBefore(d,at.nextSibling);else p.insertBefore(d,p.firstChild);
+ d.querySelectorAll('img').forEach(function(im){im.onclick=function(){var c=SCARDS[+im.dataset.i];
+  showModal('<img class="scard-big" src="'+c[0]+'" alt="'+esc(c[1])+'"><p class="scard-cap">'+esc(c[1])+'</p>')}});
 }
-function evLesson(id,tab){
- var L=EV[id-1];if(!L){evChapter();return}
- if(!evUnlocked(id)){app.innerHTML='<p class="crumb"><a href="#/e">第一章</a></p><div class="card"><h2>🔒 第'+id+'课还没打开</h2><p>交了第'+(id-1)+'课的作业，这一课就会打开。</p><a class="btn" href="#/e/L'+(id-1)+'/hw">去第'+(id-1)+'课作业</a></div>';return}
- app.innerHTML='<p class="crumb"><a href="#/">首页</a> › <a href="#/e">第一章 色块（日常路线）</a></p><h1>第'+id+'课　'+esc(L.title)+'</h1><p class="mins">⏱ 约 '+L.min+' 分钟 · 内容取自书中'+esc(L.src)+'</p>'+
-  '<nav class="tabs"><a href="#/e/L'+id+'/read" class="'+(tab==='read'?'on':'')+'">① 阅读</a><a href="#/e/L'+id+'/practice" class="'+(tab==='practice'?'on':'')+'">② 练习</a><a href="#/e/L'+id+'/hw" class="'+(tab==='hw'?'on':'')+'">③ 作业</a></nav><div id="pane"></div>';
- var p=document.getElementById('pane');
- if(tab==='read'){p.innerHTML=(id===1?videoBlock('e1'):'')+L.read+'<p class="hint">这里只摘了书中的核心内容。完整原文在“专业训练路线”。</p><div class="nextnav"><span></span><a class="btn" href="#/e/L'+id+'/practice">读完了，去练习 →</a></div>';if(id===1)bindVideo('e1')}
- else if(tab==='practice'){
-  var ws=L.practice.map(function(n){return widget(n,p)}),ex=L.extra.map(function(n){return widget(n,p)});
-  p.innerHTML='<p class="hint">练习内容取自书中正文的案例数据。屏幕颜色只作参考，真正要看的是你眼前的实物。</p>'+ws.map(function(w){return w.h}).join('')+
-   (ex.length?'<details class="extra"><summary>想多练一点（可选）</summary>'+ex.map(function(w){return w.h}).join('')+'</details>':'')+
-   '<div class="nextnav"><a class="btn sec" href="#/e/L'+id+'/read">← 回到阅读</a><a class="btn" href="#/e/L'+id+'/hw">去做作业 →</a></div>';
-  ws.concat(ex).forEach(function(w){if(w.after)w.after()});
- } else {
-  var sub=st.subs['e'+id]||{};
-  var ex2=L.hw.map(function(x){var t=esc(x.text);return '<li><p>'+t+'</p><p class="hint">书中第'+x.sec+'节'+(x.num?'·基础级第'+x.num+'题':'·预习作业')+'</p>'+
-     (/60分钟/.test(x.text)?'<p class="note">日常路线不计时，慢慢画就好；想挑战时再试60分钟。</p>':'')+
-     (/石膏/.test(x.text)?'<p class="note">网站提示：家里没有石膏几何体，可以先用白色杯子、白色纸盒或白色的球代替，在作业里写明就行。</p>':'')+'</li>'}).join('');
-  var rows=L.rubric.map(function(r){return r.row});
-  var rt='<div class="tw"><table><thead><tr><th>老师看什么</th><th>很好（3分）</th><th>可以（2分）</th><th>再练练（1分）</th></tr></thead><tbody>'+rows.map(function(r){return '<tr><td><b>'+esc(r[0])+'</b></td><td>'+esc(r[1])+'</td><td>'+esc(r[2])+'</td><td>'+esc(r[3])+'</td></tr>'}).join('')+'</tbody></table></div>';
-  p.innerHTML='<div class="card"><h2 style="margin-top:0">这一课的作业</h2><ol class="hwlist">'+ex2+'</ol>'+
-   '<div class="note"><b>日常路线约定：</b>用白话描述颜色就好（如“偏黄的很浅色”“比旁边冷一点”）。孟塞尔读数可写可不写。</div></div>'+
-   '<div class="card"><h2 style="margin-top:0">老师会看这几点</h2><p class="hint">评分标准取自书中对应小节（只保留与基础作业有关的几项）。分数只是给你的鼓励：<b>交了作业，下一课就打开</b>，也可以改了再交。</p>'+rt+'</div>'+
-   formHTML(sub,'可选，日常路线不要求');
-  var o={key:'e'+id,rows:rows,gate:false,next:id<EV.length?{href:'#/e/L'+(id+1)+'/read',name:'第'+(id+1)+'课'}:null};
-  bindForm('e'+id,function(sb,url){demoMark(o,sb,url)});
-  if(sub.at)demoMark(o,sub,null);
- }
- window.scrollTo(0,0);
-}
-
-
-/* ---------- 课程视频 ---------- */
-var VID={
- e1:{src:'video/ch1-l1-everyday.mp4',poster:'video/ch1-l1-everyday-poster.jpg',len:'约4分钟',
-     cap:'第1课视频：看见颜色，不只是看见东西。老师和学员在晨光里看一只杯子，用纸筒找出三块不一样的颜色。中途会停下来请您自己找一找。'},
- p1:{src:'video/ch1-l1-pro.mp4',poster:'video/ch1-l1-pro-poster.jpg',len:'约3½分钟',
-     cap:'第1节视频（专业版）：节奏稍快；每张色卡先出白话描述，约1秒后出现孟塞尔记号。'}
-};
-function videoBlock(k){var v=VID[k];if(!v)return '';
- return '<figure class="lvid"><video id="lv_'+k+'" controls playsinline preload="metadata" poster="'+v.poster+'"><source src="'+v.src+'" type="video/mp4">您的浏览器不能播放这个视频。</video>'+
- '<div class="vbtns"><button type="button" class="vb" data-a="play">▶ 播放</button><button type="button" class="vb" data-a="back">⟲ 退10秒</button><button type="button" class="vb" data-a="full">⛶ 全屏</button></div>'+
- '<figcaption>'+esc(v.cap)+'<small>'+v.len+' · 画面为AI生成，人物和光线不是实拍；颜色以屏幕上的色块为准。声音为合成配音（演示）。</small></figcaption></figure>'}
-function bindVideo(k){var vd=document.getElementById('lv_'+k);if(!vd)return;var f=vd.closest('figure'),pb=f.querySelector('[data-a=play]');
- function upd(){pb.textContent=vd.paused?'▶ 播放':'❚❚ 暂停'}
- vd.addEventListener('play',upd);vd.addEventListener('pause',upd);
- f.querySelectorAll('.vb').forEach(function(b){b.onclick=function(){var a=b.dataset.a;
-  if(a==='play'){vd.paused?vd.play():vd.pause()} else if(a==='back'){vd.currentTime=Math.max(0,vd.currentTime-10)}
-  else {var r=vd.requestFullscreen||vd.webkitEnterFullscreen||vd.webkitRequestFullscreen;if(r)r.call(vd)}}})}
-/* ---------- 路线切换 ---------- */
-function pathName(){return st.path==='pro'?'专业训练':'日常观察'}
-function setPath(pth,go){st.path=pth;save();updPathBtn();if(go)location.hash=pth==='pro'?'#/ch1':'#/e';else route()}
-function updPathBtn(){var b=document.getElementById('pathBtn');if(b)b.textContent=pathName().slice(0,2)+'路线 ⇄'}
-(function(){var b=document.createElement('button');b.id='pathBtn';b.type='button';b.className='mbtn';b.onclick=function(){
- showModal('<h2 style="margin-top:0">换一条路线</h2><p>两条路线学的是同一本书，随时可以换，进度都会保留。</p><p><button class="btn" id="mEv">日常观察路线</button><button class="btn sec" id="mPro">专业训练路线</button></p>');
- document.getElementById('mEv').onclick=function(){document.getElementById('modal').hidden=true;setPath('ev',true)};
- document.getElementById('mPro').onclick=function(){document.getElementById('modal').hidden=true;setPath('pro',true)};};
- var w=document.createElement('div');w.className='hbtns';var m=document.getElementById('whatMunsell');m.parentNode.insertBefore(w,m);w.appendChild(b);w.appendChild(m);updPathBtn()})();
-
 /* ---------- 路由 ---------- */
 function route(){
  var h=location.hash.replace(/^#\/?/,'').split('/');
  if(h[0]==='ch1'&&h[1]){var n=+h[1].slice(1);section(n,h[2]||'read')}
  else if(h[0]==='ch1')chapter();
- else if(h[0]==='e'&&h[1])evLesson(+h[1].slice(1),h[2]||'read');
- else if(h[0]==='e')evChapter();
+ else if(h[0]==='e'){location.replace('#/ch1');return}
  else home();
 }
 function hh(){var t=document.querySelector('.top');document.documentElement.style.setProperty('--hh',t.offsetHeight+'px')}

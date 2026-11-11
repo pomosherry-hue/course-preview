@@ -142,13 +142,15 @@ summary{font-weight:700;cursor:pointer}
 @media (max-width:420px){.brand span{font-size:.55rem}.brand{font-size:.95rem}}
 
 /* 第1节场景图卡 */
-.scards{margin:14px 0 22px}
-.scards-t{margin:0 0 10px}
-.scards-g{display:grid;grid-template-columns:1fr;gap:16px}
+.scards-g{display:grid;grid-template-columns:1fr;gap:16px;margin:16px 0 8px}
 @media (min-width:700px){.scards-g{grid-template-columns:1fr 1fr}}
-.scards figure{margin:0;background:var(--paper);border-radius:14px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.10)}
-.scards img{display:block;width:100%;height:auto;cursor:zoom-in}
-.scards figcaption{padding:10px 12px;font-size:17px;font-weight:600}
+.scard{margin:0;background:var(--paper);border-radius:14px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.10)}
+.scard img{display:block;width:100%;height:auto;cursor:zoom-in;background:#f1e9de}
+.scard figcaption{padding:10px 12px;font-size:17px;font-weight:600}
+.scards-note{margin:4px 0 18px}
 .scard-big{display:block;width:100%;height:auto;border-radius:10px}
 .scard-cap{margin:8px 0 0;font-size:17px;text-align:center}
 .modalbody .scard-big{margin-top:30px}
+.modal:has(.scard-big){padding:6px}
+.modalbox:has(.scard-big){padding:8px 6px 10px;max-height:94vh}
+.scard-cap a{font-weight:700}

@@ -79,7 +79,8 @@ function section(n,tab){
  if(tab==='read'){
   p.innerHTML=s.head+s.read+(s.refs?'<details><summary>参考文献（本节引用）</summary>'+s.refs+'</details>':'')+
    '<div class="nextnav"><span></span><a class="btn" href="#/ch1/s'+n+'/practice">读完了，去练习 →</a></div>';
-  if(n===1)sceneCards(p);
+  p.querySelectorAll('img.scard-img').forEach(function(im){im.onclick=function(){
+   showModal('<img class="scard-big" src="'+im.getAttribute('src')+'" alt="'+esc(im.alt)+'"><p class="scard-cap">'+esc(im.alt)+' · <a href="'+im.getAttribute('src')+'" target="_blank" rel="noopener">打开原图（可两指放大）</a></p>')}});
   if(n===1){var c=p.querySelector('.mchip');if(c){var at=c.closest('.tw')||c.closest('p');var d=document.createElement('div');d.innerHTML=explainer();at.parentNode.insertBefore(d.firstChild,at)}}
  } else if(tab==='practice'){ practice(n,p) } else { homework(n,p) }
  window.scrollTo(0,0);
@@ -269,23 +270,6 @@ function demoMark(o,sub,photoURL){
  if(photoURL)box.scrollIntoView({behavior:'smooth'});
 }
 
-/* ---------- 第1节场景图卡 ---------- */
-var SCARDS=[
- ['img/l1-card1-cup.jpg','案例1 白瓷杯与晨光'],
- ['img/l1-card2-wall-sunny.jpg','案例2 办公室白墙 · 晴天'],
- ['img/l1-card3-wall-cloudy.jpg','案例2 办公室白墙 · 阴天'],
- ['img/l1-card4-road-noon.jpg','案例3 柏油路面 · 正午'],
- ['img/l1-card5-road-dusk.jpg','案例3 柏油路面 · 黄昏']];
-function sceneCards(p){
- var at=[].slice.call(p.querySelectorAll('h4')).filter(function(h){return h.textContent.indexOf('案例与色彩分析')>=0})[0];
- var d=document.createElement('section');d.className='scards';
- d.innerHTML='<h4 class="scards-t">场景图卡（点图片可放大）</h4><div class="scards-g">'+SCARDS.map(function(c,i){
-  return '<figure><img src="'+c[0]+'" alt="'+esc(c[1])+'" loading="lazy" width="1080" height="1350" data-i="'+i+'"><figcaption>'+esc(c[1])+'</figcaption></figure>'}).join('')+
-  '</div><p class="hint">照片为AI生成，颜色以卡片上的色块为准（按书中孟塞尔数值绘制）。</p>';
- if(at)at.parentNode.insertBefore(d,at.nextSibling);else p.insertBefore(d,p.firstChild);
- d.querySelectorAll('img').forEach(function(im){im.onclick=function(){var c=SCARDS[+im.dataset.i];
-  showModal('<img class="scard-big" src="'+c[0]+'" alt="'+esc(c[1])+'"><p class="scard-cap">'+esc(c[1])+'</p>')}});
-}
 /* ---------- 路由 ---------- */
 function route(){
  var h=location.hash.replace(/^#\/?/,'').split('/');

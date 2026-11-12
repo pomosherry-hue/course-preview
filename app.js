@@ -82,7 +82,12 @@ function chapter(){
 }
 
 /* ---------- 小节页 ---------- */
+var TGT=null;
 function section(n,tab){
+ var tgt=TGT;TGT=null;
+ if(!unlocked(n)&&tgt){var s0=sec(n),mm=new RegExp('<figure class="scard" id="'+tgt+'">[\\s\\S]*?</figure>').exec(s0.read);
+  if(mm){app.innerHTML='<p class="crumb"><a href="#/">首页</a> › <a href="#/ch'+CH+'">'+esc(chName(CH))+'</a></p><h1>'+esc(s0.title)+'</h1><div class="card lockcard"><p>🔒 这一节还没解锁，先单独看看这张场景卡。学完前面的课程后，可以读到这一节的全文。</p><div class="scards-g">'+mm[0]+'</div><p class="hint">点图片可放大。测试时可点页脚“老师预览：全部解锁”。</p><p><a class="btn" href="javascript:history.back()">← 返回刚才的页面</a></p></div>';
+   bindCards(app);window.scrollTo(0,0);return}}
  if(!unlocked(n)){app.innerHTML='<p class="crumb"><a href="#/ch'+CH+'">'+esc(chName(CH))+'</a></p><div class="card"><h2>🔒 第'+n+'节还没解锁</h2><p>'+(n===1?'先完成上一章第10节作业并达标，这一章会自动打开。':'完成第'+(n-1)+'节作业并达标后，这一节会自动打开。')+'</p>'+(n===1?'<a class="btn" href="#/ch'+(CH-1)+'/s10/hw">去上一章第10节作业</a>':'<a class="btn" href="#/ch'+CH+'/s'+(n-1)+'/hw">去第'+(n-1)+'节作业</a>')+'<p class="hint">测试时可点页脚“老师预览：全部解锁”。</p></div>';return}
  var s=sec(n);
  var h='<p class="crumb"><a href="#/">首页</a> › <a href="#/ch'+CH+'">'+esc(chName(CH))+'</a></p><h1>'+esc(s.title)+'</h1>'+
@@ -92,12 +97,15 @@ function section(n,tab){
  if(tab==='read'){
   p.innerHTML=s.head+s.read+(s.refs?'<details><summary>参考文献（本节引用）</summary>'+s.refs+'</details>':'')+
    '<div class="nextnav"><span></span><a class="btn" href="#/ch'+CH+'/s'+n+'/practice">读完了，去练习 →</a></div>';
-  p.querySelectorAll('img.scard-img').forEach(function(im){im.onclick=function(){
-   showModal('<img class="scard-big" src="'+im.getAttribute('src')+'" alt="'+esc(im.alt)+'"><p class="scard-cap">'+esc(im.alt)+' · <a href="'+im.getAttribute('src')+'" target="_blank" rel="noopener">打开原图（可两指放大）</a></p>')}});
+  bindCards(p);
   if(n===1&&CH===1){var c=p.querySelector('.mchip');if(c){var at=c.closest('.tw')||c.closest('p');var d=document.createElement('div');d.innerHTML=explainer();at.parentNode.insertBefore(d.firstChild,at)}}
  } else if(tab==='practice'){ practice(n,p) } else { homework(n,p) }
  window.scrollTo(0,0);
+ if(tab==='read'&&tgt){var el=document.getElementById(tgt);if(el){var im=el.querySelector('img');if(im)im.loading='eager';
+  setTimeout(function(){el.scrollIntoView({block:'center'});el.classList.add('flash');setTimeout(function(){el.classList.remove('flash')},2600)},60)}}
 }
+function bigCard(im){showModal('<img class="scard-big" src="'+im.getAttribute('src')+'" alt="'+esc(im.alt)+'"><p class="scard-cap">'+esc(im.alt)+' · <a href="'+im.getAttribute('src')+'" target="_blank" rel="noopener">打开原图（可两指放大）</a></p>')}
+function bindCards(p){p.querySelectorAll('img.scard-img,img.slink-th').forEach(function(im){im.onclick=function(){bigCard(im)}})}
 
 /* ---------- 练习 ---------- */
 function sw(k){return SW[k]}
@@ -290,7 +298,7 @@ function route(){
  var h=location.hash.replace(/^#\/?/,'').split('/');
  var mm=/^ch(\d+)$/.exec(h[0]||'');
  if(mm&&meta(+mm[1])){var c=+mm[1];needCh(c,function(){CH=c;D=window.BOOKCH[c];
-   if(h[1]){var n=+h[1].slice(1);if(n>=1&&n<=D.sections.length)section(n,h[2]||'read');else chapter()}else chapter()});return}
+   if(h[1]){var n=+h[1].slice(1);TGT=/^c-[\w-]+$/.test(h[3]||'')?h[3]:null;if(n>=1&&n<=D.sections.length)section(n,h[2]||'read');else chapter()}else chapter()});return}
  else if(h[0]==='e'){location.replace('#/ch1');return}
  else home();
 }

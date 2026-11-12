@@ -157,3 +157,11 @@ summary{font-weight:700;cursor:pointer}
 
 /* long arrow chains like R→YR→Y… must wrap on phones */
 main p, main li, main td, main h4, main h5 { overflow-wrap: anywhere; }
+
+/* scene-card links (看场景卡) */
+.slinks{margin:.4em 0 1em;display:flex;flex-direction:column;gap:.45em}
+.slink{display:flex;align-items:center;gap:.6em;background:#f6efe4;border:1px solid #e3d6c3;border-radius:10px;padding:.4em .6em}
+.slink-th{width:44px;height:55px;object-fit:cover;border-radius:5px;flex:none;cursor:zoom-in;background:#eee}
+.slink a{font-size:.95em;line-height:1.4;overflow-wrap:anywhere}
+.scard.flash{outline:3px solid #c0623a;outline-offset:3px;border-radius:12px;transition:outline-color .6s}
+.lockcard .scards-g{margin:.6em 0}
